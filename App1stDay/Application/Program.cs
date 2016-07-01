@@ -25,9 +25,14 @@ namespace Application
                 }
             }
 
-            foreach (var pair in table)
+            var orderedTable = table.OrderBy(x => -x.Value);
+            int i = 0;
+            foreach (var pair in orderedTable)
             {
-                Console.WriteLine("Cuvantul \"{0}\" are {1} aparitii", pair.Key,pair.Value);
+                if (i < 10)
+                    Console.WriteLine("Cuvantul \"{0}\" are {1} aparitii", pair.Key, pair.Value);
+                else
+                    break;
             }
         }
     }
