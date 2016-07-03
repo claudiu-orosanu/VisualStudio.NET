@@ -9,55 +9,21 @@ namespace MyHomework
     public class Employee : Person
     {
         //fields
-        private DateTime dateOfEmployment;
-        private double salary;
-        private int availableDaysOff;
+        public DateTime DateOfEmployment { get; set; }
+        public double Salary { get; set; }
+        public int AvailableDaysOff { get; set; }
         private List<Leave> leaveList;
 
         //constructor
         public Employee(string firstName, string lastName, DateTime dateOfBirth,DateTime dateOfEmployment, 
                         double salary, int availableDaysOff) : base(firstName,lastName,dateOfBirth)
         {
-            this.dateOfEmployment = dateOfEmployment;
-            this.salary = salary;
-            this.availableDaysOff = availableDaysOff;
+            DateOfEmployment = dateOfEmployment;
+            Salary = salary;
+            AvailableDaysOff = availableDaysOff;
             leaveList = new List<Leave>();
         }
 
-        //properties
-        public DateTime DateOfEmployment
-        {
-            get
-            {
-                return dateOfEmployment;
-            }
-            set
-            {
-                dateOfEmployment = value;
-            }
-        }
-        public double Salary
-        {
-            get
-            {
-                return salary;
-            }
-            set
-            {
-                salary = value;
-            }
-        }
-        public int AvailableDaysOff
-        {
-            get
-            {
-                return availableDaysOff; 
-            }
-            set
-            {
-                availableDaysOff = value;
-            }
-        }
         public List<Leave> LeaveList
         {
             get
@@ -69,13 +35,13 @@ namespace MyHomework
         //DisplayInfo
         public void DisplayInfo()
         {
-            Console.WriteLine("Lastname: {0}, Firstname: {1}, Salary: {2}, Available days off: {3}",lastName,firstName,salary,availableDaysOff);
+            Console.WriteLine("Lastname: {0}, Firstname: {1}, Salary: {2}, Available days off: {3}",lastName,firstName,Salary,AvailableDaysOff);
         }
 
         //scadere zile de concediu
         private void SubtractDays(int numberOfDays)
         {
-            availableDaysOff -= numberOfDays;
+            AvailableDaysOff -= numberOfDays;
         }
 
         //adaugare concediu
@@ -83,7 +49,7 @@ namespace MyHomework
         {
             try
             {
-                if (availableDaysOff - leave.Duration >= 0)
+                if (AvailableDaysOff - leave.Duration >= 0)
                 {
                     SubtractDays(leave.Duration);
                     leave.Employee = this;
@@ -103,21 +69,26 @@ namespace MyHomework
         //afiseaza concediile din anul "year" dat ca parametru
         public void DisplayLeaves(int year)
         {
-            foreach (var leave in leaveList)
-            { 
-                if (leave.StartingDate.Year == year)
-                {
-                    Console.WriteLine(leave);
-                }
+            //foreach (var leave in leaveList)
+            //{ 
+            //    if (leave.StartingDate.Year == year)
+            //    {
+            //        Console.WriteLine(leave);
+            //    }
+            //}
+            IEnumerable<Leave> query = leaveList.Where(leave => leave.StartingDate.Year == year);
+            foreach (var leave in query)
+            {
+                Console.WriteLine(leave);
             }
-        }
+        } 
 
         //override ToString()
         public override string ToString()
         {
             return String.Format("Lastname: {0}, Firstname: {1}, Birthdate: {2}, Date of employment: {3} " +
                                 "Salary: {4}, Available days off: {5}",
-                                lastName, firstName, dateOfBirth, dateOfEmployment, salary, availableDaysOff);
+                                lastName, firstName, dateOfBirth, DateOfEmployment, Salary, AvailableDaysOff);
         }
     }
 }

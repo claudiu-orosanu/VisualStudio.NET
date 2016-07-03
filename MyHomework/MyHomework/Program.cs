@@ -19,6 +19,7 @@ namespace MyHomework
             e1.AddNewLeave(l2);
             //e1.AddNewLeave(l3);  //arunca exceptia NegativeLeaveException
             e1.DisplayInfo();
+            Console.WriteLine(e1.Salary);
             Console.WriteLine("\nConcediile din anul 2016 sunt: ");
             e1.DisplayLeaves(2016);
             Console.ReadKey();
