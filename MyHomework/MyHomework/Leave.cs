@@ -8,9 +8,9 @@ namespace MyHomework
 {
     public class Leave
     {
-        private readonly DateTime startingDate;
-        private readonly int duration;  //nr de zile
-        private readonly LeaveTypeEnum leaveType;
+        private DateTime startingDate;
+        private int duration;  //nr de zile
+        private LeaveTypeEnum leaveType;
         private Employee employee;
 
         public Leave(DateTime startingDate, int duration, LeaveTypeEnum leaveType)
@@ -26,6 +26,10 @@ namespace MyHomework
             {
                 return startingDate;
             }
+            set
+            {
+                startingDate = value;
+            }
         }
         public int Duration
         {
@@ -33,12 +37,20 @@ namespace MyHomework
             {
                 return duration;
             }
+            set
+            {
+                duration = value;
+            }
         }
         public LeaveTypeEnum LeaveType
         {
             get
             {
                 return leaveType;
+            }
+            set
+            {
+                leaveType = value;
             }
         }
         public Employee Employee

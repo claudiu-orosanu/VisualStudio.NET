@@ -9,8 +9,8 @@ namespace MyHomework
     public class Employee : Person
     {
         //fields
-        private readonly DateTime dateOfEmployment;
-        private readonly double salary;
+        private DateTime dateOfEmployment;
+        private double salary;
         private int availableDaysOff;
         private List<Leave> leaveList;
 
@@ -22,6 +22,48 @@ namespace MyHomework
             this.salary = salary;
             this.availableDaysOff = availableDaysOff;
             leaveList = new List<Leave>();
+        }
+
+        //properties
+        public DateTime DateOfEmployment
+        {
+            get
+            {
+                return dateOfEmployment;
+            }
+            set
+            {
+                dateOfEmployment = value;
+            }
+        }
+        public double Salary
+        {
+            get
+            {
+                return salary;
+            }
+            set
+            {
+                salary = value;
+            }
+        }
+        public int AvailableDaysOff
+        {
+            get
+            {
+                return availableDaysOff; 
+            }
+            set
+            {
+                availableDaysOff = value;
+            }
+        }
+        public List<Leave> LeaveList
+        {
+            get
+            {
+                return leaveList;
+            }
         }
         
         //DisplayInfo
@@ -61,7 +103,7 @@ namespace MyHomework
         //afiseaza concediile din anul "year" dat ca parametru
         public void DisplayLeaves(int year)
         {
-            foreach (Leave leave in leaveList)
+            foreach (var leave in leaveList)
             { 
                 if (leave.StartingDate.Year == year)
                 {
