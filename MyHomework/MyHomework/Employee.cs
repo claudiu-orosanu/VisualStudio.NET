@@ -9,18 +9,57 @@ namespace MyHomework
     public class Employee : Person
     {
         //fields
-        public DateTime DateOfEmployment { get; set; }
-        public double Salary { get; set; }
-        public int AvailableDaysOff { get; set; }
+        public DateTime dateOfEmployment;
+        public double salary;
+        public Dictionary<int, int> availableDaysOff = new Dictionary<int, int>();
         private List<Leave> leaveList;
+
+        //proprietati
+        public DateTime DateOfEmployment
+        {
+            get
+            {
+                return dateOfEmployment;
+            }
+            set
+            {
+                dateOfEmployment = value;
+            }
+        }
+        public double Salary
+        {
+            get
+            {
+                return salary;
+            }
+            set
+            {
+                salary = value;
+            }
+        }
+        public Dictionary<int,int> AvailableDaysOff
+        {
+            get
+            {
+                return availableDaysOff;
+            }
+            set
+            {
+                availableDaysOff = value;
+            }
+        }
 
         //constructor
         public Employee(string firstName, string lastName, DateTime dateOfBirth,DateTime dateOfEmployment, 
                         double salary, int availableDaysOff) : base(firstName,lastName,dateOfBirth)
         {
-            DateOfEmployment = dateOfEmployment;
-            Salary = salary;
-            AvailableDaysOff = availableDaysOff;
+            this.dateOfEmployment = dateOfEmployment;
+            this.salary = salary;
+            //pentru anii 2010-2020 avem 30 de zile libere pe an
+            for (int i = 0; i <= 10; i++)
+            {
+                this.availableDaysOff.Add(2010 + i, availableDaysOff);
+            }
             leaveList = new List<Leave>();
         }
 
@@ -35,13 +74,16 @@ namespace MyHomework
         //DisplayInfo
         public void DisplayInfo()
         {
-            Console.WriteLine("Lastname: {0}, Firstname: {1}, Salary: {2}, Available days off: {3}",lastName,firstName,Salary,AvailableDaysOff);
+            var lines = availableDaysOff.Select(x => x.Key + ":" + x.Value);
+            var availableDays = string.Join(", ", lines);
+            
+            Console.WriteLine("Lastname: {0}, Firstname: {1}, Salary: {2}\nAvailable days off: {3}",lastName,firstName,salary,availableDays);
         }
 
         //scadere zile de concediu
-        private void SubtractDays(int numberOfDays)
+        private void SubtractDays(int numberOfDays,int year)
         {
-            AvailableDaysOff -= numberOfDays;
+            availableDaysOff[year] -= numberOfDays;
         }
 
         //adaugare concediu
@@ -49,16 +91,54 @@ namespace MyHomework
         {
             try
             {
-                if (AvailableDaysOff - leave.Duration >= 0)
+
+                //verifica daca intervalele se intersecteaza
+                bool overlap = false;
+                foreach (var l in leaveList)
                 {
-                    SubtractDays(leave.Duration);
-                    leave.Employee = this;
-                    leaveList.Add(leave);
+                    if (leave.StartingDate.Add(new TimeSpan(leave.Duration, 0, 0, 0)) > l.StartingDate &&
+                        leave.StartingDate < l.StartingDate.Add(new TimeSpan(l.Duration, 0, 0, 0)))
+
+                        overlap = true;
+                }
+
+                if (overlap == false)
+                {
+                    //daca concediul are zile in doi ani diferiti
+                    if(leave.StartingDate.Year != leave.StartingDate.Add(new TimeSpan(leave.Duration, 0, 0, 0)).Year)
+                    {
+                        //aflam cate zile sunt in primul an
+                        var days1 = (new DateTime(leave.StartingDate.Year + 1, 1, 1)).AddDays(-leave.StartingDate.Day).Day;
+                        if (availableDaysOff[leave.StartingDate.Year] >= days1)
+                            SubtractDays(days1, leave.StartingDate.Year);
+                        else
+                            throw (new NegativeLeaveException("Numarul de zile disponibile nu poate fi mai mic decat durata concediului"));
+                        //aflam cate zile sunt in al doilea an
+                        var days2 = leave.Duration - days1;
+                        if (availableDaysOff[leave.StartingDate.Year+1] >= days2)
+                            SubtractDays(days2, leave.StartingDate.Year + 1);
+                        else
+                            throw (new NegativeLeaveException("Numarul de zile disponibile nu poate fi mai mic decat durata concediului"));
+                        leave.Employee = this;
+                        leaveList.Add(leave);
+                    }
+                    else
+                    if(availableDaysOff[leave.StartingDate.Year] >= leave.Duration)
+                    {
+                        SubtractDays(leave.Duration,leave.StartingDate.Year);
+                        leave.Employee = this;
+                        leaveList.Add(leave);
+                    }
+                    else
+                    {
+                        throw (new NegativeLeaveException("Numarul de zile disponibile nu poate fi mai mic decat durata concediului"));
+                    }
                 }
                 else
                 {
-                    throw (new NegativeLeaveException("Numarul de zile disponibile nu poate fi mai mic decat durata concediului"));
+                    Console.WriteLine("Concediul introdus se suprapune cu altul deja existent");
                 }
+                
             }
             catch(NegativeLeaveException ex)
             {
@@ -69,13 +149,6 @@ namespace MyHomework
         //afiseaza concediile din anul "year" dat ca parametru
         public void DisplayLeaves(int year)
         {
-            //foreach (var leave in leaveList)
-            //{ 
-            //    if (leave.StartingDate.Year == year)
-            //    {
-            //        Console.WriteLine(leave);
-            //    }
-            //}
             IEnumerable<Leave> query = leaveList.Where(leave => leave.StartingDate.Year == year);
             foreach (var leave in query)
             {
@@ -88,7 +161,7 @@ namespace MyHomework
         {
             return String.Format("Lastname: {0}, Firstname: {1}, Birthdate: {2}, Date of employment: {3} " +
                                 "Salary: {4}, Available days off: {5}",
-                                lastName, firstName, dateOfBirth, DateOfEmployment, Salary, AvailableDaysOff);
+                                lastName, firstName, dateOfBirth, dateOfEmployment, salary, availableDaysOff);
         }
     }
 }
